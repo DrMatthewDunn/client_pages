@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <title>Test Map</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="margin: 2em;text-align: center;display: flex;justify-content: center">
+        <div style="flex-basis: 66%">
+          <h2>Impressions Locations for Matrix POC - Aug 2020</h1>
+          <div style="flex-basis: 50%; width: 100%;height: 600px;" id="map"></div>
+          <button onclick="initMap('opt_554d8085-1685-4f4c-a376-bb213fb3c2e5')">Try Again</button>
+        </div>
+  </div>
+    <script>
+      function initMap(imgID) {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: {lat: 37.090, lng: -95.712},
+          mapTypeId: 'roadmap',
+          streetViewControl: false,
+          mapTypeControl: false,
+            styles: [
+                {
+                  featureType: "administrative",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -100 },
+                    { visibility: "simplified" }
+                  ]
+                },{
+                  featureType: "landscape",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -100 }
+                  ]
+                },{
+                  featureType: "poi",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -100 }
+                  ]
+                },{
+                  featureType: "road",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -100 },
+                    { visibility: "simplified" }
+                  ]
+                },{
+                  featureType: "transit",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -100 },
+                    { visibility: "simplified" }
+                  ]
+                },{
+                  featureType: "water",
+                  elementType: "all",
+                  stylers: [
+                    { saturation: -80 }
+                  ]
+                }
+              ]
+        });
+        function addCity(city){
+          
+        }
+        var formData = {
+          'api_key':'self-api-key',
+          'imgID':imgID
+        };
+        $.ajax({
+            type: "GET",
+            url: "https://dev.campaign-genius.com/api/v1/img/charts/traffic/map",
+            data: formData,
+            encode: true,
+            timeout: 10000,
+            success: function(data){
+                var citymap = JSON.parse(data);
+                let populations = [];
+                for (var city in citymap){
+                  populations.push(citymap[city].population)
+                }
+                let max_population = Math.max(...populations);
+                let max_str = max_population.toString();
+                let max_len = max_str.length + 2;
+                let expand_circ = Math.pow(25,max_len);
+                for (var city in citymap){
+                    var cityCircle = new google.maps.Circle({
+                      strokeColor: '#FF0000',
+                      strokeOpacity: 0.8,
+                      strokeWeight: 1,
+                      fillColor: '#FF0000',
+                      fillOpacity: 0.35,
+                      map: map,
+                      center: citymap[city].center,
+                      radius: Math.sqrt(citymap[city].population * expand_circ)
+                    });
+                }
+            }, error: function(data){
+                
+            }
+        });
+      }
+    
+    </script>
+    <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvq_PxUzU2ZeWj3wOsE0wfkc2lSt13YXE">
+    </script>
+    <script>
+      $(document).ready(function(){
+        initMap('nada')
+      });
+      </script>
+  </body>
+</html>
