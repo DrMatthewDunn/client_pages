@@ -93,6 +93,7 @@
             encode: true,
             timeout: 10000,
             success: function(data){
+              console.log("data = " + JSON.stringify(data));
                 var citymap = JSON.parse(data);
                 let populations = [];
                 for (var city in citymap){
